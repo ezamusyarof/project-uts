@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <title>SMKN Wakanda | Informasi</title>
+   <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='img/img-logo-smk.png')}}">
+   <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/styles.css')}}">
+</head>
+<body>
+    
+    <div class="notif">{{notif}}</div>
+    <div class="menu">
+        <ul>
+            <img src="{{ url_for('static',filename='img/img-logo-smk.png')}}" alt="" class="logo">
+            <li><a href="\index">Beranda</a></li>
+            <li class="{{underline}}"><a href="/informasi/0">Informasi</a></li>
+            <span  {{dashboard_menu}}><li><a href="\dashboard" {{dashboard_menu}}>Dashboard</a></li></span>
+            <li><a href="">{{menu_akun}}</a>
+                <ul class="sub">
+                    <li><a href="\login">Login</a></li>
+                    <li><a href="\signup">Sign-up</a></li>
+                    <li><a href="\logout">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="kosong"></div>
+    <div class="welcome">
+        <div class="kosong"></div>
+        <p class="judull">SMK Negeri Wakanda</p> <br>
+        <p class="judulll">Data Siswa SMK Negeri Wakanda</p> <br>
+        <table class="tabel1">
+            <tr>
+                {% for items in data_kelas %}
+                <th><a href="\informasi\{{items[0]}}">{{ items[1] }}</a></th>
+                {% endfor %}
+            </tr>
+        </table>
+        <table class="tabel">
+            <thead>
+                <h3 style="margin: 20px 7.5%;">Daftar Siswa Kelas <b>{{cur_kelas}}</b> :</h3>
+                <tr>
+                    <th>NIS</th>
+                    <th>Nama</th>
+                    <th>Gender</th>
+                    <th>Kota Asal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in data_siswa %}
+                <tr>
+                    <th>{{ item[0] }}</th>
+                    <th>{{ item[1] }}</th>
+                    <th>{{ item[5] }}</th>
+                    <th>{{ item[3] }}</th>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="kosong"></div>
+    </div>
+    <div class="kosong"></div>
+
+</body>
+</html>

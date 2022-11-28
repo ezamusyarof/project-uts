@@ -1,0 +1,53 @@
+body .wrapper {
+    font-size: auto;
+}
+
+body .nav-link {
+    background-color: auto;
+}
+
+body .brand-link span {
+    padding: 100px 10px 100px 10px;
+    color: #ffffff;
+}
+
+body div .sidebar .info a:hover {
+    text-decoration: none;
+    color: #d0d0d0;
+}
+
+body div div .info-box .info-box-icon {
+    background-color: none;
+}
+
+.right-arrow {
+    margin-right: 10px;
+}
+
+.right-arrow:hover {
+    margin: 0px 5px;
+}
+
+.username {
+    color: #17A2B8;
+    text-decoration: bold;
+}
+
+.contoh-berita {
+    text-decoration: underline;
+    color: #17A2B8;
+}
+
+.product-description {
+    margin-top: -15px;
+    margin-bottom: 10px;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    -ms-overflow-style: none;  /* IE dan Edge */
+    scrollbar-width: none;  /* Firefox */
+}

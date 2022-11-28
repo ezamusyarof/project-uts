@@ -1,0 +1,53 @@
+body {
+    background-color: rgb(0, 136, 255);
+    /* color: aqua; */
+}
+
+.login-logo {
+    color: #3677B2;
+}
+
+.login-logo img {
+    width: 100px;
+    margin-bottom: 20px;
+}
+
+body .card p, label, a{
+    color: #3677B2;
+}
+
+body a:hover{
+    text-decoration: underline;
+    color: #3677B2;
+}
+
+body .card button {
+    background-color: #3677B2;
+    border-color: #3677B2;
+}
+
+body .card button a {
+    padding: 8px 16px;
+    color: #ffffff;
+}
+
+body .card button a:hover {
+    text-decoration: none;
+    color: #3677B2;
+}
+
+.card button:hover {
+    background-color: #ffffff;
+    border-color: #3677B2;
+    color: #3677B2;
+}
+
+.card .btn {
+    background-color: #3677B2;
+    border-color: #3677B2;
+}
+
+.card .social-auth-links .btn:hover {
+    background-color: #3677B2;
+    border-color: #3677B2;
+}
