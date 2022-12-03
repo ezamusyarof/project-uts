@@ -123,19 +123,19 @@
                     <tbody>
                       {% for item in data_siswa %}
                       <tr>
-                        <td>{{ item[0] }}</td>
-                        <td>{{ item[1] }}</td>
-                        <td>{{ item[2] }}</td>
-                        <td>{{ item[3] }}</td>
-                        <td>{{ item[4] }}</td>
-                        <td>{{ item[5] }}</td>
-                        <td>{{ item[6] }}</td>
-                        <td>{{ item[7] }}</td>
-                        <td>{{ item[8] }}</td>
-                        <td>{{ item[9] }}</td>
+                        <td>{{item}}</td>
+                        <td>{{data_siswa[item].nama}}</td>
+                        <td>{{data_siswa[item].alamat}}</td>
+                        <td>{{data_siswa[item].tmp_lahir}}</td>
+                        <td>{{data_siswa[item].tgl_lahir}}</td>
+                        <td>{{data_siswa[item].gender}}</td>
+                        <td>{{data_siswa[item].agama}}</td>
+                        <td>{{data_siswa[item].id_kelas}}</td>
+                        <td>{{data_siswa[item].kd_ortu}}</td>
+                        <td>{{data_siswa[item].tgl_daftar}}</td>
                         <td>
-                          <a href="\edit1\{{item[0]}}"><button type="button" class="btn btn-warning">Edit</button></a>
-                          <a href="\delete1\{{item[0]}}"><button type="button" class="btn btn-danger"><i class="fas fa-trash"></i></button></a>
+                          <a href="\edit1\{{item}}"><button type="button" class="btn btn-warning">Edit</button></a>
+                          <a href="\delete1\{{item}}"><button type="button" class="btn btn-danger"><i class="fas fa-trash"></i></button></a>
                         </td>
                       </tr>
                       {% endfor %}
@@ -178,16 +178,16 @@
                     <tbody>
                       {% for item in data_ortu %}
                       <tr>
-                        <td>{{ item[0] }}</td>
-                        <td>{{ item[1] }}</td>
-                        <td>{{ item[2] }}</td>
-                        <td>{{ item[3] }}</td>
-                        <td>{{ item[4] }}</td>
-                        <td>{{ item[5] }}</td>
-                        <td>{{ item[6] }}</td>
+                        <td>{{ item }}</td>
+                        <td>{{ data_ortu[item].nama }}</td>
+                        <td>{{ data_ortu[item].alamat }}</td>
+                        <td>{{ data_ortu[item].telp }}</td>
+                        <td>{{ data_ortu[item].pekerjaan }}</td>
+                        <td>{{ data_ortu[item].agama }}</td>
+                        <td>{{ data_ortu[item].status }}</td>
                         <td>
-                          <a href="\edit2\{{item[0]}}"><button type="button" class="btn btn-warning">Edit</button></a>
-                          <a href="\delete2\{{item[0]}}"><button type="button" class="btn btn-danger" disabled><i class="fas fa-trash"></i></button></a>
+                          <a href="\edit2\{{item}}"><button type="button" class="btn btn-warning">Edit</button></a>
+                          <a href="\delete2\{{item}}"><button type="button" class="btn btn-danger" disabled><i class="fas fa-trash"></i></button></a>
                         </td>
                       </tr>
                       {% endfor %}
@@ -230,19 +230,19 @@
                     <tbody>
                       {% for item in data_guru %}
                       <tr>
-                        <td>{{ item[0] }}</td>
-                        <td>{{ item[1] }}</td>
-                        <td>{{ item[2] }}</td>
-                        <td>{{ item[3] }}</td>
-                        <td>{{ item[4] }}</td>
-                        <td>{{ item[5] }}</td>
-                        <td>{{ item[6] }}</td>
-                        <td>{{ item[7] }}</td>
-                        <td>{{ item[8] }}</td>
-                        <td>{{ item[9] }}</td>
+                        <td>{{ item }}</td>
+                        <td>{{ data_guru[item].nama }}</td>
+                        <td>{{ data_guru[item].alamat }}</td>
+                        <td>{{ data_guru[item].tmp_lahir }}</td>
+                        <td>{{ data_guru[item].tgl_lahir }}</td>
+                        <td>{{ data_guru[item].gender }}</td>
+                        <td>{{ data_guru[item].agama }}</td>
+                        <td>{{ data_guru[item].telp }}</td>
+                        <td>{{ data_guru[item].pendidikan }}</td>
+                        <td>{{ data_guru[item].status }}</td>
                         <td>
-                          <a href="\edit3\{{item[0]}}"><button type="button" class="btn btn-warning">Edit</button></a>
-                          <a href="\delete3\{{item[0]}}"><button type="button" class="btn btn-danger" style="width: 52.5px;"><i class="fas fa-trash"></i></button></a>
+                          <a href="\edit3\{{item}}"><button type="button" class="btn btn-warning">Edit</button></a>
+                          <a href="\delete3\{{item}}"><button type="button" class="btn btn-danger" style="width: 52.5px;"><i class="fas fa-trash"></i></button></a>
                         </td>
                       </tr>
                       {% endfor %}
@@ -280,11 +280,11 @@
                     <tbody>
                       {% for item in data_mapel %}
                       <tr>
-                        <td>{{ item[0] }}</td>
-                        <td>{{ item[1] }}</td>
+                        <td>{{ item }}</td>
+                        <td>{{ data_mapel[item].mapel }}</td>
                         <td>
-                          <a href="\edit6\{{item[0]}}"><button type="button" class="btn btn-warning" style="margin-bottom: 5px;">Edit</button></a>
-                          <a href="\delete6\{{item[0]}}"><button type="button" class="btn btn-danger" style="width: 52.5px;"><i class="fas fa-trash"></i></button></a>
+                          <a href="\edit6\{{item}}"><button type="button" class="btn btn-warning" style="margin-bottom: 5px;">Edit</button></a>
+                          <a href="\delete6\{{item}}"><button type="button" class="btn btn-danger" style="width: 52.5px;"><i class="fas fa-trash"></i></button></a>
                         </td>
                       </tr>
                       {% endfor %}
@@ -323,12 +323,12 @@
                     <tbody>
                       {% for item in data_kelas %}
                       <tr>
-                        <td>{{ item[0] }}</td>
-                        <td>{{ item[1] }}</td>
-                        <td>{{ item[2] }}</td>
+                        <td>{{ item }}</td>
+                        <td>{{ data_kelas[item].kelas }}</td>
+                        <td>{{ data_kelas[item].nip }}</td>
                         <td>
-                          <a href="\edit4\{{item[0]}}"><button type="button" class="btn btn-warning" style="margin-bottom: 5px;">Edit</button></a>
-                          <a href="\delete4\{{item[0]}}"><button type="button" class="btn btn-danger" style="width: 52.5px;"><i class="fas fa-trash"></i></button></a>
+                          <a href="\edit4\{{item}}"><button type="button" class="btn btn-warning" style="margin-bottom: 5px;">Edit</button></a>
+                          <a href="\delete4\{{item}}"><button type="button" class="btn btn-danger" style="width: 52.5px;"><i class="fas fa-trash"></i></button></a>
                         </td>
                       </tr>
                       {% endfor %}
@@ -367,11 +367,11 @@
                       {% for item in data_user %}
                       
                       <tr>
-                        <td>{{ item[0] }}</td>
-                        <td>{{ item[1] }}</td>
+                        <td>{{ item }}</td>
+                        <td>{{ data_user[item].kata_kunci }}</td>
                         <td>
-                          <a href="\edit5\{{item[0]}}"><button type="button" class="btn btn-warning" style="margin-bottom: 5px;">Edit</button></a>
-                          <a href="\delete5\{{item[0]}}"><button type="button" class="btn btn-danger" style="width: 52.5px;"><i class="fas fa-trash"></i></button></a>
+                          <a href="\edit5\{{item}}"><button type="button" class="btn btn-warning" style="margin-bottom: 5px;">Edit</button></a>
+                          <a href="\delete5\{{item}}"><button type="button" class="btn btn-danger" style="width: 52.5px;"><i class="fas fa-trash"></i></button></a>
                         </td>
                       </tr>
                       {% endfor %}
@@ -408,8 +408,8 @@
                     <tbody>
                       {% for item in data_mengajar %}
                       <tr>
-                        <td>{{ item[0] }}</td>
-                        <td>{{ item[1] }}</td>
+                        <td>{{ item }}</td>
+                        <td>{{ data_mengajar[item].id_mapel }}</td>
                       </tr>
                       {% endfor %}
                     </tbody>
@@ -422,9 +422,8 @@
             </div>
           </div>
 
-          
-
         </div>
+        <a href="\database">Database API</a> <br><br>
       </div>
     </section>
   </div>
