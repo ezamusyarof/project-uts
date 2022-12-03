@@ -1,5 +1,5 @@
-import mysql.connector
-from flask import Flask, redirect, render_template, request, url_for
+import mysql.connector, requests
+from flask import Flask, redirect, render_template, request, jsonify, json
 
 application = Flask(__name__)
 
@@ -38,15 +38,11 @@ def index():
     # manipulasi menu pada beranda
     dashboard_menu='hidden'
     menu_akun=nama_akun
-    if nama_akun=='admin':
-        dashboard_menu='enabled'
-    elif nama_akun=='':
-        menu_akun='Guest'
+    if nama_akun=='admin': dashboard_menu='enabled'
+    elif nama_akun=='': menu_akun='Guest'
     underline = 'underline'
     # menampilkan halaman beranda
-    return render_template(
-        'index.html',menu_akun=menu_akun,dashboard_menu=dashboard_menu,underline=underline
-    )
+    return render_template('index.html',menu_akun=menu_akun,dashboard_menu=dashboard_menu,underline=underline)
 
 # untuk halaman informasi
 @application.route('/informasi/<int:id>')
@@ -64,38 +60,44 @@ def informasi(id):
         notif="Maaf, untuk mengakses informasi sekolah kami, anda harus login terlebih dahulu 🙏"
         return render_template('index.html',notif=notif,menu_akun=menu_akun,dashboard_menu=dashboard_menu,underline=underline)
     else:
-        db = getMysqlConnection()
-        cur = db.cursor()
-        if id == 0 :
-            cur.execute("SELECT * from kelas")
-            data_kelas = cur.fetchall()
-            db.close()
-            cur_id = str(data_kelas[0][0])
-            cur_kelas = data_kelas[0][1]
-        else :
-            idStr = str(id)
-            cur.execute("SELECT * from kelas where id_kelas='"+idStr+"'")
-            data_kelas = cur.fetchall()
-            db.close()
-            cur_id = str(data_kelas[0][0])
-            cur_kelas = data_kelas[0][1]
+        cur_id = ""
+        cur_kelas = ""
         # ambil data kelas
-        db = getMysqlConnection()
-        cur = db.cursor()
-        cur.execute("SELECT * from kelas")
-        data_kelas_all = cur.fetchall()
-        db.close()
-        # ambil data kelas berdasarkan id yang akan ditampilkan
-        db = getMysqlConnection()
-        cur = db.cursor()
-        cur.execute("SELECT * FROM `siswa` WHERE `id_kelas`='"+cur_id+"'")
-        data_siswa = cur.fetchall()
-        db.close()
+        all_data = requests.get("http://127.0.0.1:5000/database/")
+        data_kelas_all = all_data.json()["data_kelas"]
+        data_siswa = all_data.json()["data_siswa"]
+        if id == 0 :
+            for item in data_kelas_all:
+                cur_id = str(item)
+                cur_kelas = data_kelas_all[item]['kelas']
+                break
+        else :
+            for item in data_kelas_all:
+                if str(item) == str(id):
+                    cur_id = str(id)
+                    cur_kelas = data_kelas_all[item]['kelas']
+        # ambil data siswa kelas by kelas
+        new_data_siswa = create_dict()
+        for item in data_siswa:
+            if str(data_siswa[item]['id_kelas']) == cur_id:
+                new_data_siswa.add(item,({
+                    "nama":data_siswa[item]["nama"],
+                    "alamat":data_siswa[item]["alamat"],
+                    "tmp_lahir":data_siswa[item]["tmp_lahir"],
+                    "tgl_lahir":data_siswa[item]["tgl_lahir"],
+                    "gender":data_siswa[item]["gender"],
+                    "id_kelas":data_siswa[item]["id_kelas"],
+                    "kd_ortu":data_siswa[item]["kd_ortu"],
+                    "tgl_daftar":data_siswa[item]["tgl_daftar"],
+                }))
+        print(new_data_siswa)
+        print(cur_id)
+        print(cur_kelas)
         # menampilkan halaman informasi
         return render_template(
             'informasi.html',
             nama_akun=nama_akun,
-            data_siswa=data_siswa,
+            data_siswa=new_data_siswa,
             data_kelas=data_kelas_all,
             cur_kelas=cur_kelas,
             menu_akun=menu_akun,
@@ -106,51 +108,16 @@ def informasi(id):
 # untuk dashboard
 @application.route('/dashboard')
 def dashboard():
-    global nama_akun 
-    nama_akun= 'admin'
-    # ambil data siswa
-    db = getMysqlConnection()
-    cur = db.cursor()
-    cur.execute("SELECT * from siswa")
-    data_siswa = cur.fetchall()
-    db.close()
-    # ambil data orang tua
-    db = getMysqlConnection()
-    cur = db.cursor()
-    cur.execute("SELECT * from orang_tua")
-    data_ortu = cur.fetchall()
-    db.close()
-    # ambil data guru
-    db = getMysqlConnection()
-    cur = db.cursor()
-    cur.execute("SELECT * from guru")
-    data_guru = cur.fetchall()
-    db.close()
-    # ambil data mapel
-    db = getMysqlConnection()
-    cur = db.cursor()
-    cur.execute("SELECT * from mapel")
-    data_mapel = cur.fetchall()
-    db.close()
-    # ambil data kelas
-    db = getMysqlConnection()
-    cur = db.cursor()
-    cur.execute("SELECT * from kelas")
-    data_kelas = cur.fetchall()
-    db.close()
-    # ambil data user
-    db = getMysqlConnection()
-    cur = db.cursor()
-    cur.execute("SELECT * from pengguna")
-    data_user = cur.fetchall()
-    db.close()
-    # ambil data mengajar
-    db = getMysqlConnection()
-    cur = db.cursor()
-    cur.execute("SELECT * from mengajar")
-    data_mengajar = cur.fetchall()
-    db.close()
-    # menampilkan halaman dashboard
+    global nama_akun; nama_akun= 'admin'
+    # ambil data
+    all_data = requests.get("http://127.0.0.1:5000/database/")
+    data_siswa = all_data.json()["data_siswa"]
+    data_ortu = all_data.json()["data_ortu"]
+    data_guru = all_data.json()["data_guru"]
+    data_mapel = all_data.json()["data_mapel"]
+    data_kelas = all_data.json()["data_kelas"]
+    data_user = all_data.json()["data_user"]
+    data_mengajar = all_data.json()["data_mengajar"]
     return render_template(
         'dashboard.html',
         data_siswa=data_siswa,
@@ -169,9 +136,7 @@ def login():
     print(request.method)
     if request.method == 'GET':
         # menampilkan halaman login
-        return render_template(
-            'login.html',notif=notif
-        )
+        return render_template('login.html',notif=notif)
     elif request.method == 'POST':
         # ambil value form login
         nama_pengguna = request.form['username']
@@ -204,9 +169,7 @@ def signup():
     print(request.method)
     if request.method == 'GET':
         # menampilkan halaman sign-up
-        return render_template(
-            'signup.html',notif=notif
-        )
+        return render_template('signup.html',notif=notif)
     elif request.method == 'POST':
         nama_pengguna = request.form['username']
         kata_kunci = request.form['password']
@@ -214,10 +177,7 @@ def signup():
         # filter verifikasi password
         if kata_kunci != kata_kunci_verif:
             notif="Maaf password berbeda"
-            return render_template(
-                'signup.html',
-                notif=notif
-            )
+            return render_template('signup.html',notif=notif)
         # ambil data pengguna
         db = getMysqlConnection()
         cur = db.cursor()
@@ -229,10 +189,7 @@ def signup():
             print(item[0])
             if item[0] == nama_pengguna :
                 notif = "✘ Maaf username telah ada"
-                return render_template(
-                    'signup.html',
-                    notif=notif
-                )
+                return render_template('signup.html',notif=notif)
         # insert pengguna baru
         db = getMysqlConnection()
         try:
@@ -281,11 +238,7 @@ def registrasi():
     # get or post form
     if request.method == 'GET':
         # ambil data kelas
-        db = getMysqlConnection()
-        cur = db.cursor()
-        cur.execute("SELECT * from kelas")
-        data_kelas = cur.fetchall()
-        db.close()
+        data_kelas = get_data_kelas()
         # menampilkan halaman registrasi
         return render_template(
             'registrasi.html',
@@ -322,12 +275,7 @@ def registrasi():
         for item in datakt :
             if str(item[0]) == nis :
                 sukses = "✘ Maaf nis telah ada"
-                return render_template(
-                    'registrasi.html',
-                    sukses=sukses,
-                    hidden_elemen=hidden_elemen,
-                    khusus_user=khusus_user
-                )
+                return render_template('registrasi.html',sukses=sukses,hidden_elemen=hidden_elemen,khusus_user=khusus_user)
         # menonaktifkan foreign key
         close_fk()
         # insert data orang tua baru
@@ -351,26 +299,16 @@ def registrasi():
         open_fk()
         # menampilkan halaman registrasi berhasil
         sukses = "✔ Registrasi Berhasil"
-        return render_template(
-            'registrasi.html',
-            sukses=sukses,
-            hidden_elemen=hidden_elemen,
-            khusus_user=khusus_user
-        )     
+        return render_template('registrasi.html',sukses=sukses,hidden_elemen=hidden_elemen,khusus_user=khusus_user)
 
 # tambah data guru
 @application.route('/addguru', methods=['GET', 'POST'])
 def addguru():
     if request.method == 'GET':
-        db = getMysqlConnection()
-        cur = db.cursor()
-        cur.execute("SELECT * from mapel")
-        data_mapel = cur.fetchall()
-        db.close()
+        # ambil data mapel
+        data_mapel = get_data_mapel()
         # menampilkan halaman tambah guru
-        return render_template(
-            'addguru.html',data_mapel=data_mapel
-        )
+        return render_template('addguru.html',data_mapel=data_mapel)
     elif request.method == 'POST':
         # ambil value form
         nip = request.form['nip']
@@ -389,19 +327,12 @@ def addguru():
         # mapellist = ', '.join(checked)
         # print(mapellist)
         # ambil data guru
-        db = getMysqlConnection()
-        cur = db.cursor()
-        cur.execute("SELECT * from guru")
-        data_guru = cur.fetchall()
-        db.close()
+        data_guru = get_data_guru()
         # filter nip guru apakah sudah ada?
         for item in data_guru :
             if item[0] == nip :
                 sukses = "✘ Maaf NIP telah terdaftar"
-                return render_template(
-                    'addguru.html',
-                    sukses=sukses
-                )
+                return render_template('addguru.html',sukses=sukses)
         # close foreign key
         close_fk()
         # insert data guru baru
@@ -419,10 +350,7 @@ def addguru():
         open_fk()
         # menampilkan halaman tambah guru sukses
         sukses = "✔ Data berhasil diupload"
-        return render_template(
-            'addguru.html',
-            sukses=sukses
-        )     
+        return render_template('addguru.html',sukses=sukses)
 
 # tambah data kelas
 @application.route('/addkelas', methods=['GET', 'POST'])
@@ -439,16 +367,10 @@ def addkelas():
         cur_code = item[0]
     id_kelas_cur = cur_code+1
     # ambil data guru
-    db = getMysqlConnection()
-    cur = db.cursor()
-    cur.execute("SELECT * from guru")
-    data_guru = cur.fetchall()
-    db.close()
+    data_guru = get_data_guru()
     # menampilkan form add new kelas
     if request.method == 'GET':
-        return render_template(
-            'addkelas.html',data_guru=data_guru,id_kelas_cur=id_kelas_cur
-        )
+        return render_template('addkelas.html',data_guru=data_guru,id_kelas_cur=id_kelas_cur)
     # mengambil data dan insert to database
     elif request.method == 'POST':
         # ambil data input
@@ -466,12 +388,7 @@ def addkelas():
         # menampilkan halaman tambah kelas berhasil
         sukses = "✔ Data berhasil ditambah"
         id_kelas_cur = id_kelas_cur+1
-        return render_template(
-            'addkelas.html',
-            data_guru=data_guru,
-            sukses=sukses,
-            id_kelas_cur=id_kelas_cur
-        )
+        return render_template('addkelas.html',data_guru=data_guru,sukses=sukses,id_kelas_cur=id_kelas_cur)
 
 # tambah data user
 @application.route('/adduser', methods=['GET', 'POST'])
@@ -479,9 +396,7 @@ def adduser():
     print(request.method)
     # menampilkan halaman tambah user
     if request.method == 'GET':
-        return render_template(
-            'adduser.html'
-        )
+        return render_template('adduser.html')
     # mengambil data dan insert to database
     elif request.method == 'POST':
         # ambil data input
@@ -497,10 +412,7 @@ def adduser():
         db.close()
         sukses = "✔ Data berhasil ditambah"
         # menampilkan halaman tambah pengguna berhasil
-        return render_template(
-            'adduser.html',
-            sukses=sukses
-        )
+        return render_template('adduser.html',sukses=sukses)
 
 # tambah data mapel
 @application.route('/addmapel', methods=['GET', 'POST'])
@@ -518,10 +430,7 @@ def addmapel():
     id_mapel_cur = cur_code+1
     # menampilkan halaman tambah mapel
     if request.method == 'GET':
-        return render_template(
-            'addmapel.html',
-            id_mapel_cur=id_mapel_cur
-        )
+        return render_template('addmapel.html',id_mapel_cur=id_mapel_cur)
     # mengambil data dan insert to database
     elif request.method == 'POST':
         # ambil data input
@@ -537,11 +446,7 @@ def addmapel():
         sukses = "✔ Data berhasil ditambah"
         id_mapel_cur = id_mapel_cur + 1
         # menampilkan halaman tambah pengguna berhasil
-        return render_template(
-            'addmapel.html',
-            id_mapel_cur=id_mapel_cur,
-            sukses=sukses
-        )
+        return render_template('addmapel.html',id_mapel_cur=id_mapel_cur,sukses=sukses)
 
 # untuk edit data
 @application.route('/edit2/<int:key>', methods=['GET','POST'])
@@ -574,19 +479,12 @@ def edit2(key):
         # menampilkan halaman edit
         sukses = "✔ Data berhasil diedit"
         disabled='disabled'
-        return render_template(
-            'editortu.html',
-            data=data,
-            sukses=sukses
-        )
+        return render_template('editortu.html',data=data,sukses=sukses)
     # menampilkan halaman edit orang tua
     else:
         cur.close()
         db.close()
-        return render_template(
-            'editortu.html',
-            data=data
-        ) 
+        return render_template('editortu.html',data=data)
 
 # untuk edit data
 @application.route('/edit1/<int:key>', methods=['GET','POST'])
@@ -594,7 +492,7 @@ def edit1(key):
     # ambil data siswa
     db = getMysqlConnection()
     cur = db.cursor()
-    readData = 'SELECT * FROM siswa WHERE nis='+str(key)+''
+    readData = "SELECT * FROM siswa WHERE nis='"+str(key)+"';"
     cur.execute(readData)
     data = cur.fetchone()
     # ambil dan update data
@@ -619,33 +517,21 @@ def edit1(key):
         # menampilkan halaman edit siswa berhasil
         sukses = "✔ Data berhasil diedit"
         disabled='disabled'
-        return render_template(
-            'editsiswa.html',
-            data=data,
-            sukses=sukses,
-            disabled=disabled
-        )
+        return render_template('editsiswa.html',data=data,sukses=sukses,disabled=disabled)
     # menampilkan halaman edit siswa
     else:
         cur.close()
         db.close()
         # ambil data kelas
-        db = getMysqlConnection()
-        cur = db.cursor()
-        cur.execute("SELECT * from kelas")
-        data_kelas = cur.fetchall()
+        data_kelas = get_data_kelas()
         # ambil nama kelas
         for x in data_kelas:
+            print(x)
+            print(data)
             if x[0]==data[7]:
                 cur_id_kelas=x[1]
-        db.close()
         # menampilkan edit siswa berhasil
-        return render_template(
-            'editsiswa.html', 
-            data=data,
-            data_kelas=data_kelas,
-            cur_id_kelas=cur_id_kelas
-        ) 
+        return render_template('editsiswa.html', data=data, data_kelas=data_kelas, cur_id_kelas=cur_id_kelas)
 
 # untuk edit guru
 @application.route('/edit3/<int:key>', methods=['GET','POST'])
@@ -654,8 +540,7 @@ def edit3(key):
     db = getMysqlConnection()
     cur = db.cursor()
     cur.execute("SELECT * from mapel")
-    data_mapel = cur.fetchall()
-    db.close()
+    data_mapel = get_data_mapel()
     # ambil data guru dengan nip
     db = getMysqlConnection()
     cur = db.cursor()
@@ -693,21 +578,11 @@ def edit3(key):
         # menampilkan halaman edit guru berhasil
         sukses = "✔ Data berhasil diedit"
         disabled='disabled'
-        return render_template(
-            'editguru.html',
-            data=data,
-            data_mapel=data_mapel,
-            sukses=sukses,
-            disabled=disabled
-        )
+        return render_template( 'editguru.html', data=data, data_mapel=data_mapel, sukses=sukses, disabled=disabled )
     else:
         cur.close()
         db.close()
-        return render_template(
-            'editguru.html',
-            data=data,
-            data_mapel=data_mapel
-        ) 
+        return render_template( 'editguru.html', data=data, data_mapel=data_mapel ) 
 
 # untuk edit kelas
 @application.route('/edit4/<int:key>', methods=['GET','POST'])
@@ -745,24 +620,12 @@ def edit4(key):
         # menampilkan halaman edit kelas sukses
         sukses = "✔ Data berhasil diedit"
         disabled ='disabled'
-        return render_template(
-            'editkelas.html',
-            data=data,
-            data_guru=data_guru,
-            cur_nama_guru=cur_nama_guru,
-            sukses=sukses,
-            disabled=disabled
-        )
+        return render_template('editkelas.html', data=data, data_guru=data_guru, cur_nama_guru=cur_nama_guru, sukses=sukses, disabled=disabled)
     # menampilkan halaman edit kelas
     else:
         cur.close()
         db.close()
-        return render_template(
-            'editkelas.html',
-            data=data,
-            data_guru=data_guru,
-            cur_nama_guru=cur_nama_guru
-        ) 
+        return render_template('editkelas.html',data=data,data_guru=data_guru,cur_nama_guru=cur_nama_guru)
 
 # untuk edit pengguna
 @application.route('/edit5/<string:key>', methods=['GET','POST'])
@@ -790,20 +653,12 @@ def edit5(key):
         # menampilkan halaman edit pengguna berhasil
         sukses = "✔ Data berhasil diedit"
         disabled ='disabled'
-        return render_template(
-            'edituser.html',
-            data=data,
-            sukses=sukses,
-            disabled=disabled
-        )
+        return render_template('edituser.html',data=data,sukses=sukses,disabled=disabled)
     # menampilkan halaman edit date
     else:
         cur.close()
         db.close()
-        return render_template(
-            'edituser.html',
-            data=data
-        ) 
+        return render_template('edituser.html',data=data) 
 
 # untuk edit mapel
 @application.route('/edit6/<int:key>', methods=['GET','POST'])
@@ -830,20 +685,12 @@ def edit6(key):
         # menampilkan halaman edit pengguna berhasil
         sukses = "✔ Data berhasil diedit"
         disabled ='disabled'
-        return render_template(
-            'editmapel.html',
-            data=data,
-            sukses=sukses,
-            disabled=disabled
-        )
+        return render_template('editmapel.html',data=data,sukses=sukses,disabled=disabled)
     # menampilkan halaman edit date
     else:
         cur.close()
         db.close()
-        return render_template(
-            'editmapel.html',
-            data=data
-        )
+        return render_template('editmapel.html',data=data)
 
 # untuk delete siswa dan orang tuanya
 @application.route('/delete1/<int:id>')
@@ -935,6 +782,125 @@ def delete6(key):
     open_fk()
     # redirect ke dashboard
     return redirect('../dashboard')
+
+@application.route('/api')
+def api():
+    all_data = requests.get("http://127.0.0.1:5000/database/")
+    data_siswa = all_data.json()["data_siswa"]
+    data_ortu = all_data.json()["data_ortu"]
+    return render_template('api.html',data_siswa=data_siswa,data_guru=data_ortu)
+
+@application.route('/person/')
+def hello():
+    return jsonify({'name':'Eza','address':'Indonesia'})
+
+@application.route('/database/')
+def database():
+    # ambil data-data
+    data_siswa = get_data_siswa()
+    data_ortu = get_data_ortu()
+    data_guru = get_data_guru()
+    data_mapel = get_data_mapel()
+    data_kelas = get_data_kelas()
+    data_user = get_data_user()
+    data_mengajar = get_data_mengajar()
+    # convert data ke bentuk objek
+    db_siswa = create_dict()
+    for row in data_siswa:
+        db_siswa.add(row[0],({"nama":row[1],"alamat":row[2],"tmp_lahir":row[3],"tgl_lahir":str(row[4]),"gender":row[5],"agama":row[6],"id_kelas":row[7],"kd_ortu":row[8],"tgl_daftar":str(row[9])}))
+    db_ortu = create_dict()
+    for row in data_ortu:
+        db_ortu.add(row[0],({"nama":row[1],"alamat":row[2],"telp":row[3],"pekerjaan":row[4],"agama":row[5],"status":row[6]}))
+    db_guru = create_dict()
+    for row in data_guru:
+        db_guru.add(row[0],({"nama":row[1],"alamat":row[2],"tmp_lahir":row[3],"tgl_lahir":str(row[4]),"gender":row[5],"agama":row[6],"telp":row[7],"pendidikan":row[8],"status":row[9]}))
+    db_kelas = create_dict()
+    for row in data_kelas:
+        db_kelas.add(row[0],({"kelas":row[1],"nip":row[2]}))
+    db_mapel = create_dict()
+    for row in data_mapel:
+        db_mapel.add(row[0],({"mapel":row[1]}))
+    db_mengajar = create_dict()
+    for row in data_mengajar:
+        db_mengajar.add(row[0],({"id_mapel":row[1]}))
+    db_user = create_dict()
+    for row in data_user:
+        db_user.add(row[0],({"kata_kunci":row[1]}))
+    return jsonify(
+        data_siswa=db_siswa,
+        data_ortu=db_ortu,
+        data_guru=db_guru,
+        data_mapel=db_mapel,
+        data_kelas=db_kelas,
+        data_user=db_user,
+        data_mengajar=db_mengajar
+    )
+    # data_json = json.dumps(siswa_class, indent=2, sort_keys=False)
+    # elemen_json = json.loads(data_json)
+    # print(elemen_json["1309"]["nama"])
+    # return render_template('api.html',test=elemen_json)
+
+class create_dict(dict): 
+    def __init__(self): 
+        self = dict()
+    def add(self, key, value): 
+        self[key] = value
+
+def get_data_siswa():
+    db = getMysqlConnection()
+    cur = db.cursor()
+    cur.execute("SELECT * from siswa")
+    data_siswa = cur.fetchall()
+    db.close()
+    return data_siswa
+
+def get_data_ortu():
+    db = getMysqlConnection()
+    cur = db.cursor()
+    cur.execute("SELECT * from orang_tua")
+    data_ortu = cur.fetchall()
+    db.close()
+    return data_ortu
+
+def get_data_guru():
+    db = getMysqlConnection()
+    cur = db.cursor()
+    cur.execute("SELECT * from guru")
+    data_guru = cur.fetchall()
+    db.close()
+    return data_guru
+
+def get_data_mapel():
+    db = getMysqlConnection()
+    cur = db.cursor()
+    cur.execute("SELECT * from mapel")
+    data_mapel = cur.fetchall()
+    db.close()
+    return data_mapel
+
+def get_data_kelas():
+    db = getMysqlConnection()
+    cur = db.cursor()
+    cur.execute("SELECT * from kelas")
+    data_kelas = cur.fetchall()
+    db.close()
+    return data_kelas
+
+def get_data_user():
+    db = getMysqlConnection()
+    cur = db.cursor()
+    cur.execute("SELECT * from pengguna")
+    data_user = cur.fetchall()
+    db.close()
+    return data_user
+
+def get_data_mengajar():
+    db = getMysqlConnection()
+    cur = db.cursor()
+    cur.execute("SELECT * from mengajar")
+    data_mengajar = cur.fetchall()
+    db.close()
+    return data_mengajar
 
 # looping
 if __name__ == '__main__':
