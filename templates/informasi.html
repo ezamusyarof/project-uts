@@ -30,8 +30,8 @@
         <p class="judulll">Data Siswa SMK Negeri Wakanda</p> <br>
         <table class="tabel1">
             <tr>
-                {% for items in data_kelas %}
-                <th><a href="\informasi\{{items[0]}}">{{ items[1] }}</a></th>
+                {% for item in data_kelas %}
+                <th><a href="\informasi\{{ item }}">{{ data_kelas[item].kelas }}</a></th>
                 {% endfor %}
             </tr>
         </table>
@@ -48,10 +48,10 @@
             <tbody>
                 {% for item in data_siswa %}
                 <tr>
-                    <th>{{ item[0] }}</th>
-                    <th>{{ item[1] }}</th>
-                    <th>{{ item[5] }}</th>
-                    <th>{{ item[3] }}</th>
+                    <th>{{ item }}</th>
+                    <th>{{ data_siswa[item].nama }}</th>
+                    <th>{{ data_siswa[item].gender }}</th>
+                    <th>{{ data_siswa[item].tmp_lahir }}</th>
                 </tr>
                 {% endfor %}
             </tbody>
